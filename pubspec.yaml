@@ -1,0 +1,30 @@
+name: cortek_solar_designer
+description: CORTek Solar Designer - Solar sizing and installer assistant MVP.
+publish_to: "none"
+version: 1.5.2+14
+
+environment:
+  sdk: ">=3.4.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+  pdf: ^3.11.1
+  printing: ^5.13.4
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/branding/
+    - assets/products/air_conditioners/
+    - assets/products/solar_panels/
+  fonts:
+    - family: NotoSansThai
+      fonts:
+        - asset: assets/fonts/NotoSansThai-Variable.ttf
