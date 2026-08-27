@@ -8,6 +8,10 @@ import '../widgets/pvforge_components.dart';
 import 'result_screen.dart';
 import 'summary_screen.dart';
 import 'air_conditioner_selection_screen.dart';
+import 'location_map_screen.dart';
+import 'roof_info_screen.dart';
+import 'electrical_system_screen.dart';
+import 'site_photos_screen.dart';
 
 class ProjectScreen extends StatefulWidget {
   final SolarProject project;
@@ -315,15 +319,50 @@ class _ProjectScreenState extends State<ProjectScreen> {
             ),
             const SizedBox(height: 14),
             _detailMenu(Icons.location_on_outlined, 'สถานที่ติดตั้ง',
-                color: PVForgeColors.primary),
+                color: PVForgeColors.primary,
+                onTap: () async {
+                  await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (_) =>
+                              LocationMapScreen(project: widget.project)));
+                  // ที่อยู่อาจถูกแก้ในหน้าแผนที่ด้วย ต้องรีเฟรชช่องที่อยู่
+                  // ในหน้านี้ให้ตรงกัน ไม่งั้นจะเห็นค่าเก่าค้างอยู่
+                  addressCtrl.text = widget.project.installationAddress;
+                  if (mounted) setState(() {});
+                }),
             _detailMenu(Icons.roofing_outlined, 'ข้อมูลหลังคา',
-                color: PVForgeColors.warning),
+                color: PVForgeColors.warning,
+                onTap: () async {
+                  await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (_) =>
+                              RoofInfoScreen(project: widget.project)));
+                  if (mounted) setState(() {});
+                }),
             _detailMenu(Icons.electrical_services_outlined, 'ระบบไฟฟ้า',
-                color: PVForgeColors.battery),
+                color: PVForgeColors.battery,
+                onTap: () async {
+                  await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (_) =>
+                              ElectricalSystemScreen(project: widget.project)));
+                  if (mounted) setState(() {});
+                }),
             _detailMenu(Icons.cable_outlined, 'จุดติดตั้งและระยะสาย',
                 color: const Color(0xFF8B5CF6)),
             _detailMenu(Icons.add_a_photo_outlined, 'รูปภาพหน้างาน',
-                color: PVForgeColors.critical),
+                color: PVForgeColors.critical,
+                onTap: () async {
+                  await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (_) =>
+                              SitePhotosScreen(project: widget.project)));
+                  if (mounted) setState(() {});
+                }),
             const SizedBox(height: 12),
             FilledButton(
               onPressed: () => setState(() => showDetails = true),
@@ -596,7 +635,7 @@ class _ProjectScreenState extends State<ProjectScreen> {
   }
 
   Widget _detailMenu(IconData icon, String title,
-          {Color color = PVForgeColors.primary}) =>
+          {Color color = PVForgeColors.primary, VoidCallback? onTap}) =>
       Card(
         margin: const EdgeInsets.only(bottom: 8),
         child: ListTile(
@@ -604,10 +643,11 @@ class _ProjectScreenState extends State<ProjectScreen> {
           title:
               Text(title, style: const TextStyle(fontWeight: FontWeight.w600)),
           trailing: const Icon(Icons.chevron_right),
-          onTap: () => ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-                content: Text('เลือกกรอก$titleได้ในส่วนข้อมูลคำนวณด้านล่าง')),
-          ),
+          onTap: onTap ??
+              // เมนูนี้ยังไม่มีหน้าของตัวเอง (อยู่ระหว่างพิจารณาว่าจะออกแบบ
+              // ยังไง) เลยแจ้งชั่วคราวว่ากรอกด้านล่างได้
+              () => showAppBanner(
+                  context, 'เลือกกรอก$titleได้ในส่วนข้อมูลคำนวณด้านล่าง'),
         ),
       );
 

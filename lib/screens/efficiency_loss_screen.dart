@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/solar_project.dart';
+import '../services/local_project_repository.dart';
+import '../widgets/pvforge_components.dart';
 
 class EfficiencyLossScreen extends StatefulWidget {
   final SolarProject project;
@@ -40,7 +42,10 @@ class _EfficiencyLossScreenState extends State<EfficiencyLossScreen> {
   double _v(String key, double fallback) =>
       double.tryParse(c[key]!.text) ?? fallback;
 
-  void _save() {
+  // อัปเดตค่าลง object ของโปรเจกต์ในหน่วยความจำเฉย ๆ เพื่อให้ผลรวมระบบ
+  // ด้านล่าง (System Efficiency / พลังงานที่คาดการณ์ ฯลฯ) รีเฟรชสด ๆ ทันทีที่
+  // พิมพ์ — ยังไม่ได้บันทึกลงไฟล์ ต้องกดปุ่ม "บันทึกและคำนวณใหม่" ก่อน
+  void _applyFields() {
     final p = widget.project;
     p.panelEfficiency = _v('panelEfficiency', p.panelEfficiency);
     p.panelTempCoeffVoc = _v('tempCoeffVoc', p.panelTempCoeffVoc);
@@ -55,6 +60,15 @@ class _EfficiencyLossScreenState extends State<EfficiencyLossScreen> {
     p.shadingLoss = _v('shadingLoss', p.shadingLoss);
     p.otherLoss = _v('otherLoss', p.otherLoss);
     setState(() {});
+  }
+
+  // กดปุ่ม "บันทึกและคำนวณใหม่" ถึงจะเขียนค่าลงไฟล์โปรเจกต์จริง ๆ (เดิมปุ่มนี้
+  // เขียนว่า "บันทึก" แต่ไม่เคยเรียก repository เลย แก้ไขให้บันทึกจริงตามชื่อปุ่ม)
+  Future<void> _save() async {
+    _applyFields();
+    await LocalProjectRepository().save(widget.project);
+    if (!mounted) return;
+    showAppBanner(context, 'บันทึกค่าประสิทธิภาพเรียบร้อย');
   }
 
   @override
@@ -150,7 +164,7 @@ class _EfficiencyLossScreenState extends State<EfficiencyLossScreen> {
           keyboardType: const TextInputType.numberWithOptions(
               decimal: true, signed: true),
           decoration: InputDecoration(labelText: label, suffixText: suffix),
-          onChanged: (_) => _save(),
+          onChanged: (_) => _applyFields(),
         ),
       );
 

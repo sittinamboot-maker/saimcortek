@@ -58,8 +58,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
     await repository.delete(project.id);
     await _load();
     if (!mounted) return;
-    ScaffoldMessenger.of(context)
-        .showSnackBar(const SnackBar(content: Text('ลบโปรเจกต์แล้ว')));
+    showAppBanner(context, 'ลบโปรเจกต์แล้ว');
   }
 
   @override

@@ -69,8 +69,6 @@ class PVForgeCard extends StatelessWidget {
                 blurRadius: 22,
                 spreadRadius: 1,
                 offset: Offset(0, 8)),
-            BoxShadow(
-                color: Color(0xBFFFFFFF), blurRadius: 2, offset: Offset(0, -1)),
           ],
         ),
         child: child,
@@ -177,7 +175,7 @@ class MetricCard extends StatelessWidget {
       return Tooltip(
         message: label,
         child: Padding(
-          padding: EdgeInsets.all(compact ? 10 : 14),
+          padding: EdgeInsets.all(compact ? 6 : 9),
           child: Align(alignment: alignment, child: content),
         ),
       );
@@ -212,6 +210,45 @@ class SectionHeader extends StatelessWidget {
                     ]))),
         if (trailing != null) trailing!,
       ]);
+}
+
+/// แสดงข้อความแจ้งเตือนที่ด้านบนของจอ (MaterialBanner) แทน SnackBar (ด้านล่าง)
+/// เพราะด้านล่างจอโดนแถบเมนูลอย (AppBottomNavigation) บังข้อความจนอ่านไม่ออก —
+/// ใช้ตัวเดียวกันนี้ทุกหน้า (บันทึก/แก้ไข/ลบ) ให้พฤติกรรมเหมือนกันหมดทั้งแอป
+/// พื้นหลังโปร่งแสง (ไม่ทึบ) ให้เข้าชุดกับดีไซน์กระจกฝ้าของแอป แทนสีทึบเดิม
+void showAppBanner(BuildContext context, String message,
+    {bool error = false}) {
+  final messenger = ScaffoldMessenger.of(context);
+  messenger.clearMaterialBanners();
+  final color = error ? PVForgeColors.critical : const Color(0xFF2E7D32);
+  messenger.showMaterialBanner(
+    MaterialBanner(
+      backgroundColor: color.withValues(alpha: .55),
+      content: Text(
+        message,
+        style: const TextStyle(
+          color: Colors.white,
+          fontWeight: FontWeight.w700,
+          shadows: [
+            Shadow(color: Colors.black38, blurRadius: 4, offset: Offset(0, 1)),
+          ],
+        ),
+      ),
+      leading: Icon(error ? Icons.error_outline : Icons.check_circle,
+          color: Colors.white),
+      actions: [
+        TextButton(
+          onPressed: messenger.hideCurrentMaterialBanner,
+          child: const Text('ปิด',
+              style:
+                  TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
+        ),
+      ],
+    ),
+  );
+  Future.delayed(const Duration(seconds: 2), () {
+    messenger.hideCurrentMaterialBanner();
+  });
 }
 
 class RealtimeIndicator extends StatefulWidget {

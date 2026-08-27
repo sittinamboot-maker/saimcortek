@@ -128,12 +128,19 @@ class _EquipmentScreenState extends State<EquipmentScreen> {
   @override
   Widget build(BuildContext context) {
     final equipment = widget.project.customEquipment;
+    // แถบเมนูลอยด้านล่าง (AppBottomNavigation) วาดทับอยู่เหนือทุกหน้าอีกชั้น
+    // นอก Scaffold (ดู main.dart) ปุ่ม FAB ตำแหน่งมาตรฐานมุมขวาล่างเลยไปโผล่
+    // อยู่ใต้แถบเมนูพอดี ทำให้มองไม่เห็น/กดไม่ได้ — ยกปุ่มขึ้นให้พ้นแถบเมนู
+    final navReserve = 84 + MediaQuery.of(context).padding.bottom;
     return Scaffold(
       appBar: AppBar(title: const Text('อินเวอร์เตอร์และอุปกรณ์')),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: _openEquipmentDialog,
-        icon: const Icon(Icons.add),
-        label: const Text('เพิ่มเครื่องเอง'),
+      floatingActionButton: Padding(
+        padding: EdgeInsets.only(bottom: navReserve),
+        child: FloatingActionButton.extended(
+          onPressed: _openEquipmentDialog,
+          icon: const Icon(Icons.add),
+          label: const Text('เพิ่มเครื่องเอง'),
+        ),
       ),
       body: equipment.isEmpty
           ? Center(

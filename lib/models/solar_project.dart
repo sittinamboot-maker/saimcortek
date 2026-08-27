@@ -99,6 +99,16 @@ class SolarProject {
   String projectName;
   String customerPhone;
   String installationAddress;
+  // พิกัดที่ปักหมุดไว้บนแผนที่ (หน้า "สถานที่ติดตั้ง") — เป็น null ถ้ายังไม่
+  // เคยปักหมุด
+  double? installationLatitude;
+  double? installationLongitude;
+  // รูปแบบหลังคาที่เลือกไว้ในหน้า "ข้อมูลหลังคา" (เช่น "จั่ว", "ปั้นหยา")
+  String roofType;
+  // ระบบไฟฟ้าหน้างานที่เลือกไว้ในหน้า "ระบบไฟฟ้า" — "1 เฟส" หรือ "3 เฟส"
+  String electricalPhase;
+  // พาธไฟล์รูปภาพหน้างานที่ถ่าย/เลือกไว้ในเครื่อง (หน้า "รูปภาพหน้างาน")
+  final List<String> sitePhotoPaths;
   String customerNote;
   double monthlyBill;
   double monthlyKwh;
@@ -180,6 +190,11 @@ class SolarProject {
     this.projectName = '',
     this.customerPhone = '',
     this.installationAddress = '',
+    this.installationLatitude,
+    this.installationLongitude,
+    this.roofType = '',
+    this.electricalPhase = '1 เฟส',
+    List<String>? sitePhotoPaths,
     this.customerNote = '',
     this.monthlyBill = 3000,
     this.monthlyKwh = 450,
@@ -237,7 +252,8 @@ class SolarProject {
         updatedAt = updatedAt ?? DateTime.now(),
         customEquipment = customEquipment ?? [],
         airConditioners = airConditioners ?? [],
-        customAirConditionerModels = customAirConditionerModels ?? [];
+        customAirConditionerModels = customAirConditionerModels ?? [],
+        sitePhotoPaths = sitePhotoPaths ?? [];
 
   Map<String, dynamic> toJson() => {
         'id': id,
@@ -247,6 +263,11 @@ class SolarProject {
         'projectName': projectName,
         'customerPhone': customerPhone,
         'installationAddress': installationAddress,
+        'installationLatitude': installationLatitude,
+        'installationLongitude': installationLongitude,
+        'roofType': roofType,
+        'electricalPhase': electricalPhase,
+        'sitePhotoPaths': sitePhotoPaths,
         'customerNote': customerNote,
         'monthlyBill': monthlyBill,
         'monthlyKwh': monthlyKwh,
@@ -323,6 +344,13 @@ class SolarProject {
       projectName: j['projectName'] as String? ?? '',
       customerPhone: j['customerPhone'] as String? ?? '',
       installationAddress: j['installationAddress'] as String? ?? '',
+      installationLatitude: (j['installationLatitude'] as num?)?.toDouble(),
+      installationLongitude: (j['installationLongitude'] as num?)?.toDouble(),
+      roofType: j['roofType'] as String? ?? '',
+      electricalPhase: j['electricalPhase'] as String? ?? '1 เฟส',
+      sitePhotoPaths: (j['sitePhotoPaths'] as List? ?? [])
+          .map((e) => e as String)
+          .toList(),
       customerNote: j['customerNote'] as String? ?? '',
       monthlyBill: d('monthlyBill', 3000),
       monthlyKwh: d('monthlyKwh', 450),

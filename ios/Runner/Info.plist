@@ -26,6 +26,10 @@
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>แอปต้องใช้กล้องเพื่อถ่ายภาพหน้างานติดตั้ง</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>แอปต้องเข้าถึงคลังภาพเพื่อเลือกรูปภาพหน้างานติดตั้ง</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

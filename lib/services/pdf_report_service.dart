@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter/services.dart' show rootBundle;
@@ -16,6 +17,19 @@ class PdfReportService {
     final thaiFont = pw.Font.ttf(fontData);
     final theme = pw.ThemeData.withFont(base: thaiFont, bold: thaiFont);
     final generatedAt = DateTime.now();
+
+    // โหลดไฟล์รูปภาพหน้างานทั้งหมดล่วงหน้า (อ่านไฟล์เป็น async ต้อง await
+    // ก่อนเข้าสู่ build widget tree แบบ sync ด้านล่าง) ข้ามรูปที่ไฟล์หาย/
+    // อ่านไม่ได้เงียบ ๆ ไม่ให้ทั้งรายงานพังเพราะรูปเดียว
+    final sitePhotoImages = <pw.MemoryImage>[];
+    for (final path in p.sitePhotoPaths) {
+      try {
+        final file = File(path);
+        if (await file.exists()) {
+          sitePhotoImages.add(pw.MemoryImage(await file.readAsBytes()));
+        }
+      } catch (_) {}
+    }
 
     final doc = pw.Document();
     doc.addPage(
@@ -66,6 +80,15 @@ class PdfReportService {
               if (p.customerPhone.isNotEmpty) ('เบอร์โทร', p.customerPhone),
               if (p.installationAddress.isNotEmpty)
                 ('ที่อยู่ติดตั้ง', p.installationAddress),
+              if (p.installationLatitude != null &&
+                  p.installationLongitude != null)
+                (
+                  'พิกัด GPS',
+                  '${p.installationLatitude!.toStringAsFixed(6)}, '
+                      '${p.installationLongitude!.toStringAsFixed(6)}',
+                ),
+              if (p.roofType.isNotEmpty) ('รูปแบบหลังคา', p.roofType),
+              ('ระบบไฟฟ้า', p.electricalPhase),
               if (p.customerNote.isNotEmpty) ('หมายเหตุ', p.customerNote),
             ]),
             pw.SizedBox(height: 14),
@@ -113,6 +136,24 @@ class PdfReportService {
                           '${e.unit}${e.note.isEmpty ? '' : ' • ${e.note}'}',
                     ))
                 .toList()),
+          ],
+          if (sitePhotoImages.isNotEmpty) ...[
+            pw.SizedBox(height: 14),
+            _sectionTitle('รูปภาพหน้างาน (${sitePhotoImages.length} รูป)'),
+            pw.Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: sitePhotoImages
+                  .map((img) => pw.Container(
+                        width: 110,
+                        height: 110,
+                        decoration: pw.BoxDecoration(
+                          border: pw.Border.all(color: PdfColors.grey300),
+                        ),
+                        child: pw.Image(img, fit: pw.BoxFit.cover),
+                      ))
+                  .toList(),
+            ),
           ],
           pw.SizedBox(height: 18),
           pw.Text(

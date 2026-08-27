@@ -1,17 +1,13 @@
 import 'package:flutter/material.dart';
 
 import 'screens/auth_screen.dart';
-import 'screens/demo_screen.dart';
 import 'screens/home_screen.dart';
-import 'screens/workspace_screen.dart';
+import 'screens/settings_screen.dart';
 import 'theme/pvforge_theme.dart';
 import 'widgets/app_bottom_navigation.dart';
-import 'widgets/pvforge_components.dart';
 
 final appNavigatorKey = GlobalKey<NavigatorState>();
 void main() => runApp(const CortekSolarApp());
-
-enum AppVisualMode { warm, monochrome }
 
 class CortekSolarApp extends StatefulWidget {
   const CortekSolarApp({super.key});
@@ -29,89 +25,36 @@ class _CortekSolarAppState extends State<CortekSolarApp> {
     return buildPVForgeTheme(monochrome: mono);
   }
 
-  Widget _background(Widget child) => Stack(
-        fit: StackFit.expand,
-        children: [
-          Image.asset(
-            'assets/branding/pvforge_app_background.png',
-            fit: BoxFit.cover,
-            alignment: Alignment.bottomCenter,
-            filterQuality: FilterQuality.high,
+  // เดิมใช้รูปภาพเป็นพื้นหลัง (Image.asset) แต่รูปโหลดช้าทำให้เห็นจอขาวก่อน
+  // สักครู่ทุกครั้งที่เปิดแอป — เปลี่ยนกลับมาใช้พื้นไล่สีขาวไปฟ้าธรรมดาแทน
+  // (ไม่ต้องโหลดไฟล์รูปเลย ขึ้นทันที)
+  Widget _background(Widget child) => DecoratedBox(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Colors.white,
+              PVForgeColors.backgroundHighlight,
+              PVForgeColors.primaryLight,
+            ],
           ),
-          DecoratedBox(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  Colors.white.withValues(alpha: .16),
-                  Colors.white.withValues(alpha: .42),
-                  Colors.white.withValues(alpha: .10),
-                ],
-              ),
-            ),
-          ),
-          child,
-        ],
+        ),
+        child: child,
       );
 
-  void _showThemePicker(BuildContext context) {
-    showModalBottomSheet<void>(
-      context: context,
-      builder: (sheetContext) => SafeArea(
-          child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: ListView(shrinkWrap: true, children: [
-                const Text('เลือกโทนสีแอป',
-                    style:
-                        TextStyle(fontSize: 18, fontWeight: FontWeight.w800)),
-                const SizedBox(height: 12),
-                ListTile(
-                  leading: const GradientIconBadge(
-                      icon: Icons.business_outlined,
-                      color: PVForgeColors.primary),
-                  title: const Text('Company Workspace'),
-                  subtitle: const Text('บริษัท แพ็กเกจ และสมาชิก'),
-                  trailing: const Icon(Icons.chevron_right),
-                  onTap: () {
-                    Navigator.pop(sheetContext);
-                    appNavigatorKey.currentState?.push(MaterialPageRoute(
-                        builder: (_) => const WorkspaceScreen()));
-                  },
-                ),
-                const Divider(),
-                ListTile(
-                  leading: const GradientIconBadge(
-                      text: 'D', color: PVForgeColors.warning),
-                  title: const Text('DEMO'),
-                  subtitle: const Text('ทดลองออกแบบระบบด้วยข้อมูลตัวอย่าง'),
-                  trailing: const Icon(Icons.chevron_right),
-                  onTap: () {
-                    Navigator.pop(sheetContext);
-                    appNavigatorKey.currentState?.push(
-                        MaterialPageRoute(builder: (_) => const DemoScreen()));
-                  },
-                ),
-                const Divider(),
-                _themeChoice(
-                    sheetContext, AppVisualMode.warm, 'ธีมมาตรฐาน PVForge'),
-                _themeChoice(sheetContext, AppVisualMode.monochrome, 'ขาวดำ'),
-              ]))),
-    );
+  // เดิมเป็น modal bottom sheet (_showThemePicker) ลอยขึ้นมา ตอนนี้เปลี่ยน
+  // ไปเป็นหน้าเต็มจอ (SettingsScreen) เหมือนเมนูอื่น ๆ แล้วตามที่ขอ — เปิด
+  // ผ่าน appNavigatorKey เพื่อให้อยู่ในสแต็กเดียวกับหน้าอื่นที่ AppBottomNavigation
+  // ใช้อยู่ (จะได้เห็นแถบเมนูล่างค้างอยู่เหมือนหน้าอื่นด้วย)
+  void _openSettings() {
+    appNavigatorKey.currentState?.push(MaterialPageRoute(
+      builder: (_) => SettingsScreen(
+        currentMode: mode,
+        onModeChanged: (value) => setState(() => mode = value),
+      ),
+    ));
   }
-
-  Widget _themeChoice(
-          BuildContext sheetContext, AppVisualMode value, String label) =>
-      ListTile(
-        leading: Icon(mode == value
-            ? Icons.radio_button_checked
-            : Icons.radio_button_off),
-        title: Text(label),
-        onTap: () {
-          setState(() => mode = value);
-          Navigator.pop(sheetContext);
-        },
-      );
 
   @override
   Widget build(BuildContext context) => MaterialApp(
@@ -136,12 +79,7 @@ class _CortekSolarAppState extends State<CortekSolarApp> {
                   top: false,
                   child: AppBottomNavigation(
                       navigatorKey: appNavigatorKey,
-                      onSettings: () {
-                        final navigatorContext = appNavigatorKey.currentContext;
-                        if (navigatorContext != null) {
-                          _showThemePicker(navigatorContext);
-                        }
-                      }),
+                      onSettings: _openSettings),
                 ),
               ),
             ],

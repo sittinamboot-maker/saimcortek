@@ -40,10 +40,6 @@ class _AppBottomNavigationState extends State<AppBottomNavigation> {
             decoration: BoxDecoration(
               color: Colors.white.withValues(alpha: .58),
               borderRadius: BorderRadius.circular(24),
-              border: Border.all(
-                color: Colors.white.withValues(alpha: .82),
-                width: 1.2,
-              ),
               boxShadow: const [
                 BoxShadow(
                   color: Color(0x2B0277BD),

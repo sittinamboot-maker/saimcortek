@@ -42,98 +42,54 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _stringOrBoostScreen(SolarProject p) =>
       p.isAirSolarSystem ? BoostMpptSelectionScreen(project: p) : StringCheckerScreen(project: p);
 
+  // เดิมหน้านี้มีพื้นหลังรูปภาพ + ไล่สีของตัวเองซ้อนอยู่ในหน้านี้อีกชั้น
+  // (นอกเหนือจากพื้นหลังไล่สีขาวไปฟ้าที่ตั้งไว้ระดับแอปใน main.dart) — เอาออก
+  // ให้ใช้พื้นหลังเดียวจาก main.dart ทั้งแอป จะได้ไม่ซ้อนกันและโหลดเร็วขึ้น
   @override
   Widget build(BuildContext context) => Scaffold(
-        body: Stack(
-          fit: StackFit.expand,
-          children: [
-            Image.asset(
-              'assets/branding/pvforge_app_background.png',
-              fit: BoxFit.cover,
-              alignment: Alignment.bottomCenter,
-              filterQuality: FilterQuality.high,
-            ),
-            const DecoratedBox(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    Color(0x52DCEEFF),
-                    Color(0x66F7FAFD),
-                    Color(0x5CFFFFFF),
-                  ],
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  stops: [0, .28, 1],
-                ),
-              ),
-            ),
-            SafeArea(
-              bottom: false,
-              child: RefreshIndicator(
-                onRefresh: _load,
-                child: LayoutBuilder(builder: (context, constraints) {
-                  final compact = constraints.maxHeight < 800;
-                  final width = constraints.maxWidth >= 800
-                      ? 760.0
-                      : constraints.maxWidth;
-                  return ListView(
-                    padding: EdgeInsets.zero,
-                    physics: const NeverScrollableScrollPhysics(),
-                    children: [
-                    Center(
-                        child: SizedBox(
-                            width: width,
-                            child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  _hero(height: compact ? 145 : 275),
-                                  Padding(
-                                      padding: const EdgeInsets.fromLTRB(
-                                          16, 0, 16, 28),
-                                      child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            _createProjectBanner(
-                                                compact: compact),
-                                            SizedBox(height: compact ? 12 : 20),
-                                            SectionHeader('โปรเจกต์ล่าสุด',
-                                                trailing: TextButton(
-                                                    onPressed: () => _open(
-                                                        const ProjectsScreen()),
-                                                    child: const Text(
-                                                        'ดูทั้งหมด  ›'))),
-                                            SizedBox(height: compact ? 6 : 9),
-                                            _latestProject(compact: compact),
-                                            SizedBox(height: compact ? 12 : 20),
-                                            SectionHeader(
-                                              'ภาพรวม',
-                                              trailing: Container(
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                        horizontal: 11,
-                                                        vertical: 5),
-                                                decoration: BoxDecoration(
-                                                  color: Colors.white,
-                                                  borderRadius:
-                                                      BorderRadius.circular(20),
-                                                ),
+        body: SafeArea(
+          bottom: false,
+          child: RefreshIndicator(
+            onRefresh: _load,
+            child: LayoutBuilder(builder: (context, constraints) {
+              final compact = constraints.maxHeight < 800;
+              final width = constraints.maxWidth >= 800
+                  ? 760.0
+                  : constraints.maxWidth;
+              return ListView(
+                padding: EdgeInsets.zero,
+                physics: const NeverScrollableScrollPhysics(),
+                children: [
+                Center(
+                    child: SizedBox(
+                        width: width,
+                        child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              _hero(height: compact ? 145 : 275),
+                              Padding(
+                                  padding: const EdgeInsets.fromLTRB(
+                                      16, 0, 16, 28),
+                                  child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        _createProjectBanner(
+                                            compact: compact),
+                                        SizedBox(height: compact ? 12 : 20),
+                                        SectionHeader('โปรเจกต์ล่าสุด',
+                                            trailing: TextButton(
+                                                onPressed: () => _open(
+                                                    const ProjectsScreen()),
                                                 child: const Text(
-                                                  'ทั้งหมด ⌄',
-                                                  style:
-                                                      TextStyle(fontSize: 11),
-                                                ),
-                                              ),
-                                            ),
-                                            SizedBox(height: compact ? 6 : 10),
-                                            _overviewGrid(compact: compact),
-                                          ])),
-                                ]))),
-                  ]);
-                }),
-              )),
-          ],
-        ),
+                                                    'ดูทั้งหมด  ›'))),
+                                        SizedBox(height: compact ? 6 : 9),
+                                        _latestProject(compact: compact),
+                                      ])),
+                            ]))),
+              ]);
+            }),
+          )),
       );
 
   Widget _hero({required double height}) => SizedBox(
@@ -314,63 +270,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   ])),
               const Icon(Icons.chevron_right),
             ])));
-  }
-
-  Widget _overviewGrid({required bool compact}) {
-    final totalKwp = projects.fold<double>(0, (sum, p) => sum + p.systemKwp);
-    final yearlyMwh = projects.fold<double>(
-            0, (sum, p) => sum + p.estimatedDailyProduction * 365) /
-        1000;
-    final items = [
-      (
-        Icons.folder_open,
-        '${projects.length}',
-        '',
-        'โปรเจกต์ทั้งหมด',
-        PVForgeColors.primary
-      ),
-      (
-        Icons.solar_power,
-        totalKwp.toStringAsFixed(2),
-        'kWp',
-        'กำลังการออกแบบรวม',
-        PVForgeColors.battery
-      ),
-      (
-        Icons.insights,
-        yearlyMwh.toStringAsFixed(2),
-        'MWh',
-        'พลังงานคาดการณ์/ปี',
-        PVForgeColors.warning
-      ),
-      (
-        Icons.account_balance_wallet_outlined,
-        ((totalKwp * 9300).toStringAsFixed(0)),
-        '฿',
-        'มูลค่าระบบรวม',
-        Color(0xFF8B5CF6)
-      ),
-    ];
-    return GridView.builder(
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            childAspectRatio: compact ? 1.75 : 1.35,
-            crossAxisSpacing: 10,
-            mainAxisSpacing: 10),
-        itemCount: items.length,
-        itemBuilder: (_, i) {
-          final item = items[i];
-          return MetricCard(
-              value: item.$2,
-              unit: item.$3,
-              label: item.$4,
-              icon: item.$1,
-              color: item.$5,
-              compact: compact,
-              transparent: true);
-        });
   }
 
   Widget _continueCard() => PVForgeCard(

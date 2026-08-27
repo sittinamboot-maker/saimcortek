@@ -204,8 +204,7 @@ class _WorkspaceScreenState extends State<WorkspaceScreen> {
         if (mounted) setState(() {});
       } on StateError catch (error) {
         if (mounted) {
-          ScaffoldMessenger.of(context)
-              .showSnackBar(SnackBar(content: Text(error.message)));
+          showAppBanner(context, error.message, error: true);
         }
       }
     }

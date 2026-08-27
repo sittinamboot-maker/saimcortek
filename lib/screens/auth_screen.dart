@@ -36,26 +36,28 @@ class _AuthScreenState extends State<AuthScreen> {
   @override
   Widget build(BuildContext context) => Scaffold(
         body: SafeArea(
-          child: Center(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(24),
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 430),
-                child: Column(children: [
-                  Semantics(
-                    label: 'PVForge Solar Designer',
-                    image: true,
-                    child: Image.asset(
-                      'assets/branding/pvforge_login_logo_transparent.png',
-                      width: 360,
-                      height: 215,
-                      fit: BoxFit.contain,
-                      filterQuality: FilterQuality.high,
+          child: Stack(children: [
+            Center(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(24),
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 430),
+                  child: Column(children: [
+                    Semantics(
+                      label: 'PVForge Solar Designer',
+                      image: true,
+                      child: Image.asset(
+                        'assets/branding/pvforge_login_logo_transparent.png',
+                        width: 360,
+                        height: 215,
+                        fit: BoxFit.contain,
+                        filterQuality: FilterQuality.high,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 20),
-                  Card(
-                    child: Padding(
+                    const SizedBox(height: 20),
+                    // เดิมครอบด้วย Card (มีกรอบ+เงา) เอากรอบออกตามที่ขอ เหลือ
+                    // แค่ Padding เว้นระยะเดิมไว้ ฟอร์มลอยอยู่บนพื้นหลังตรง ๆ
+                    Padding(
                       padding: const EdgeInsets.all(20),
                       child: Form(
                         key: formKey,
@@ -124,25 +126,26 @@ class _AuthScreenState extends State<AuthScreen> {
                         ]),
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 14),
-                  SizedBox(
-                    width: double.infinity,
-                    child: OutlinedButton(
-                      onPressed: widget.onDemo,
-                      child: const Padding(
-                        padding: EdgeInsets.symmetric(vertical: 13),
-                        child: Text('ทดลองใช้ DEMO โดยไม่สมัครสมาชิก'),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  const Text('ระบบบัญชีพร้อมสำหรับเชื่อมต่อ Firebase Auth',
-                      style: TextStyle(fontSize: 11, color: Color(0xFF7A8491))),
-                ]),
+                    const SizedBox(height: 8),
+                    const Text('ระบบบัญชีพร้อมสำหรับเชื่อมต่อ Firebase Auth',
+                        style:
+                            TextStyle(fontSize: 11, color: Color(0xFF7A8491))),
+                  ]),
+                ),
               ),
             ),
-          ),
+            // ปุ่มทดลองใช้ DEMO: เดิมเป็น OutlinedButton (มีกรอบ) เต็มความกว้าง
+            // อยู่ใต้ฟอร์ม แก้เป็นปุ่มข้อความล้วน (ไม่มีกรอบ) ชื่อ "demo" ลอย
+            // อยู่มุมล่างขวาของจอแทนตามที่ขอ
+            Positioned(
+              right: 8,
+              bottom: 8,
+              child: TextButton(
+                onPressed: widget.onDemo,
+                child: const Text('demo'),
+              ),
+            ),
+          ]),
         ),
       );
 }

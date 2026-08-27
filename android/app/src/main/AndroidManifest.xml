@@ -1,6 +1,12 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- อินเทอร์เน็ต: ใช้โหลดแผนที่ (OpenStreetMap tiles) ในหน้า "สถานที่ติดตั้ง" -->
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <!-- กล้อง/คลังภาพ: ใช้ในหน้า "รูปภาพหน้างาน" -->
+    <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32"/>
     <application
-        android:label="cortek_solar_designer"
+        android:label="PVForge"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

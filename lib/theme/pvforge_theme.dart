@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 
+// ย้ายมาไว้ที่นี่ (เดิมประกาศใน main.dart) เพื่อให้หน้าตั้งค่า
+// (settings_screen.dart) เรียกใช้ได้โดยไม่เกิด import วนกลับไปที่ main.dart
+enum AppVisualMode { warm, monochrome }
+
 abstract final class PVForgeColors {
   static const background = Color(0xFFF5FBFE);
   static const backgroundHighlight = Color(0xFFE1F5FE);
@@ -62,7 +66,6 @@ ThemeData buildPVForgeTheme({bool monochrome = false}) {
       surfaceTintColor: Colors.transparent,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(22),
-        side: BorderSide(color: Colors.white.withValues(alpha: .82), width: 1),
       ),
     ),
     inputDecorationTheme: InputDecorationTheme(

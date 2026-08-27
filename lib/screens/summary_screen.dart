@@ -165,9 +165,7 @@ class SummaryScreen extends StatelessWidget {
       );
     } catch (e) {
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('สร้างรายงาน PDF ไม่สำเร็จ: $e')),
-        );
+        showAppBanner(context, 'สร้างรายงาน PDF ไม่สำเร็จ: $e', error: true);
       }
     }
   }
