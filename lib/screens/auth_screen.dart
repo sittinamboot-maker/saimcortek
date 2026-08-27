@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../app_version.dart';
+
 class AuthScreen extends StatefulWidget {
   final VoidCallback onSignedIn;
   final VoidCallback onDemo;
@@ -143,6 +145,16 @@ class _AuthScreenState extends State<AuthScreen> {
               child: TextButton(
                 onPressed: widget.onDemo,
                 child: const Text('demo'),
+              ),
+            ),
+            // เลขเวอร์ชันแอป ลอยมุมล่างซ้าย ให้เช็กง่าย ๆ ว่าเครื่องนี้รันโค้ด
+            // เวอร์ชันล่าสุดจริงหรือไม่
+            const Positioned(
+              left: 12,
+              bottom: 10,
+              child: Text(
+                'v$kAppVersion',
+                style: TextStyle(fontSize: 11, color: Color(0xFF9AA5B1)),
               ),
             ),
           ]),
